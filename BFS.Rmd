@@ -1,0 +1,104 @@
+---
+title: "Map Search"
+output: M_Search
+---
+
+Este projeto visa explorar possibilidades de algoritmos simples de busca em um mapa 42x42 gerado por arquivo CSV.
+
+Começando importando o plot.matrix e recebendo o CSV
+
+```{r}
+library('plot.matrix')
+csv <- read.csv("ExemploArquivoEntrada.csv", sep=';')
+```
+
+Então, separando o mapa em linhas e os elementos um por um
+
+```{r}
+splt<-c()
+for (i in 2:43){
+row<-(csv[i,])
+splt[i-1] <- c(strsplit(row,split=","))
+}
+```
+
+Criando uma matrix com os elementos da lista de valores adquirida
+
+```{r}
+mtrx <- matrix(unlist(splt), ncol = 42, nrow = 42)
+```
+
+Mas a matriz mtrx está transposta em relação à apresentada pelo professor, então devemos transpô-la novamente para ela ficar como o esperado
+
+```{r}
+matrix<-t(mtrx)
+```
+
+Agora, para desenhar o mapa, é necessário criar uma paleta de cores com cores personalizadas
+
+```{r}
+p<-c("#92d050","#948a54","#548dd4","#e36c0a")
+```
+
+Desenhando o mapa
+
+```{r}
+plot(matrix,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='')
+```
+
+Criando uma matrix auxiliar de zeros para auxiliar no algoritmo
+
+```{r}
+aux<- matrix(0,42,42)
+```
+
+Criando a função de busca em profundidade, cuja ideia é seguir os caminhos até o fim deles, seguindo a ordem Norte,Leste,Sul,Oeste.
+
+```{r}
+dfs <- function(startX,startY,targetX,targetY,aux,matrix){      #Declarando a função
+if(startX == targetX && startY == targetY){                     #Verificando se a condição de parada ocorreu
+    return (c(startX,startY))                                   #Retornando o par ordenado do fim
+}
+aux[startX,startY] <- 1                                         #Marcando o caminho como já caminhado
+if(startX-1>0){                                                 #Verificando os caminhos ao "Norte"
+    if(aux[startX-1,startY]==0){                                #Se não tiver sido caminhado ainda
+        ret<-dfs(startX-1,startY,targetX,targetY,aux,matrix)    #recebe o calculo de caminhos nessa direção
+        if(ret[1] != -1){                                       #Se não for um beco sem saída
+            return (c(startX,startY,ret))                       #Adiciona o par ordenado atual e retorna numa lista
+        }
+    }
+}
+if(startY+1<43){                                                #Verificando os caminhos ao "Leste"
+    if(aux[startX,startY+1]==0){                                #Se não tiver sido caminhado antes
+        ret<- dfs(startX,startY+1,targetX,targetY,aux,matrix)   #Recebe o calculo de caminhos nessa direção
+        if(ret[1] != -1){                                       #Se não for um beco sem saída
+            return (c(startX,startY,ret))                       #Adiciona o par ordenado atual e retorna numa lista
+        }
+    }
+}
+if(startX+1<43){                                                #Verificando os caminhos ao "Sul"
+    if(aux[startX+1,startY] == 0){                              #Se não tiver sido caminhado antes
+        ret<-dfs(startX+1,startY,targetX,targetY,aux,matrix)    #Recebe o calculo de caminhos nessa direção
+        if(ret[1] != -1){                                       #Se não for um beco sem saída
+            return (c(startX,startY,ret))                       #Adiciona o par ordenado atual e retorna numa lista
+        }
+    }
+}
+if(startY-1>0){                                                 #Verificando os caminhos ao "Oeste"
+    if(aux[startX,startY-1] == 0){                              #Se não tiver sido caminhado antes
+        ret<-dfs(startX,startY-1,targetX,targetY,aux,matrix)    #Recebe o calculo de caminhos nessa direção
+        if(ret[1] != -1){                                       #Se não for um beco sem saída
+            return (c(startX,startY,ret))                       #Adiciona o par ordenado atual e retorna numa lista
+        }
+    }
+}
+return (c(-1,-1))                                               #Se não tem mais caminhos, retorna que é um beco sem saída
+}
+```
+
+Testando o algoritmo
+
+```{r}
+dfs(42,41,42,40,aux,matrix)
+
+```
