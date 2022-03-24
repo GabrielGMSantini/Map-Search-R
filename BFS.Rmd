@@ -9,14 +9,14 @@ Começando importando o plot.matrix e recebendo o CSV
 
 ```{r}
 library('plot.matrix')
-csv <- read.csv("ExemploArquivoEntrada.csv", sep=';')
+csv <- read.csv("ExemploArquivoEntrada.csv", sep=';', header=FALSE)
 ```
 
 Então, separando o mapa em linhas e os elementos um por um
 
 ```{r}
 splt<-c()
-for (i in 2:43){
+for (i in 3:44){
 row<-(csv[i,])
 splt[i-1] <- c(strsplit(row,split=","))
 }
@@ -95,10 +95,39 @@ if(startY-1>0){                                                 #Verificando os 
 return (c(-1,-1))                                               #Se não tem mais caminhos, retorna que é um beco sem saída
 }
 ```
+Coletando o ponto de inicio e o objetivo
+```{r}
+inicio<-csv[1,]
+fim<-csv[2,]
+inicio<-strsplit(inicio,split=",")
+fim<-strsplit(fim,split=",") 
+a1<-as.double(inicio[[1]][1])                                 #Convertendo uma string em uma lista de doubles
+a2<-as.double(inicio[[1]][2])
+inicio[1]=a1
+inicio[2]<-a2
+a1=as.double(fim[[1]][1])
+a2=as.double(fim[[1]][2])
+fim[1]=a1
+fim[2]<-a2
+```
+
 
 Testando o algoritmo
 
 ```{r}
-dfs(42,41,42,40,aux,matrix)
-
+caminho<-dfs(inicio[[1]]+1,inicio[[2]]+1,fim[[1]]+1,fim[[2]]+1,aux,matrix)
+```
+Calculando o custo sem os custos de caminhar o inicio e o fim (Não sei se precisa contar eles ou não)
+```{r}
+custo<-0
+for (i in 3:length(caminho)-2){
+    if (caminho[i] %% 2 == 1){
+        xCaminho=caminho[i]
+    }
+    else{
+        yCaminho=caminho[i]
+        custo=custo+as.numeric(matrix[xCaminho,yCaminho])
+    }
+}
+custo
 ```
