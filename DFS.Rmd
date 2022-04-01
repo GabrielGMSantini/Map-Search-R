@@ -10,6 +10,7 @@ Começando importando o plot.matrix e recebendo o CSV
 ```{r}
 library('plot.matrix')
 csv <- read.csv("ExemploArquivoEntrada.csv", sep=';', header=FALSE)
+options(expressions=500000)
 ```
 
 Então, separando o mapa em linhas e os elementos um por um
@@ -43,7 +44,7 @@ p<-c("#92d050","#948a54","#548dd4","#e36c0a")
 Desenhando o mapa
 
 ```{r}
-plot(matrix,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='')
+plot(matrix,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='', breaks=1:4)
 ```
 
 Criando uma matrix auxiliar de zeros para auxiliar no algoritmo
@@ -55,7 +56,10 @@ aux<- matrix(0,42,42)
 Criando a função de busca em profundidade, cuja ideia é seguir os caminhos até o fim deles, seguindo a ordem Norte,Leste,Sul,Oeste.
 
 ```{r}
+caminhoTentado<-NA
 dfs <- function(startX,startY,targetX,targetY,aux,matrix){      #Declarando a função
+caminhoTentado<<-c(caminhoTentado,startX,startY)
+  #write(c('Visitando a posição X= ', as.character(startX), 'e Y= ', as.character(startY)), file = logCaminho, append = TRUE)
 if(startX == targetX && startY == targetY){                     #Verificando se a condição de parada ocorreu
     return (c(startX,startY))                                   #Retornando o par ordenado do fim
 }
@@ -95,7 +99,9 @@ if(startY-1>0){                                                 #Verificando os 
 return (c(-1,-1))                                               #Se não tem mais caminhos, retorna que é um beco sem saída
 }
 ```
+
 Coletando o ponto de inicio e o objetivo
+
 ```{r}
 inicio<-csv[1,]
 fim<-csv[2,]
@@ -111,23 +117,50 @@ fim[1]=a1
 fim[2]<-a2
 ```
 
-
 Testando o algoritmo
 
 ```{r}
+gc()
+caminhoTentado<-NA
 caminho<-dfs(inicio[[1]]+1,inicio[[2]]+1,fim[[1]]+1,fim[[2]]+1,aux,matrix)
+caminhoTentado<-caminhoTentado[2:length(caminhoTentado)]
 ```
+
 Calculando o custo sem os custos de caminhar o inicio e o fim (Não sei se precisa contar eles ou não)
+
 ```{r}
 custo<-0
-for (i in 3:length(caminho)-2){
-    if (caminho[i] %% 2 == 1){
+mataux<-matrix
+mataux[inicio[[1]]+1,inicio[[2]]+1]<-5
+for (i in 3:length(caminho)){
+    if (i %% 2 == 1){
         xCaminho=caminho[i]
     }
     else{
         yCaminho=caminho[i]
         custo=custo+as.numeric(matrix[xCaminho,yCaminho])
+        mataux[xCaminho,yCaminho]=5
     }
 }
 custo
+```
+Mostrando o mapa do caminho percorrido
+```{r}
+p<-c("#92d050","#948a54","#548dd4","#e36c0a","#000000")
+plot(mataux,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='',breaks=1:5)
+```
+Mostrando o mapa de todo caminho tentado
+```{r}
+mataux<-matrix
+mataux[inicio[[1]]+1,inicio[[2]]+1]<-5
+for (i in 3:length(caminhoTentado)){
+    if (i %% 2 == 1){
+        xCaminho=caminhoTentado[i]
+    }
+    else{
+        yCaminho=caminhoTentado[i]
+        mataux[xCaminho,yCaminho]=5
+    }
+}
+plot(mataux,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='',breaks=1:5)
 ```
