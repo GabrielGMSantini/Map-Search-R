@@ -59,7 +59,7 @@ Criando a função de busca em profundidade, cuja ideia é seguir os caminhos at
 caminhoTentado<-NA
 dfs <- function(startX,startY,targetX,targetY,aux,matrix){      #Declarando a função
 caminhoTentado<<-c(caminhoTentado,startX,startY)
-  #write(c('Visitando a posição X= ', as.character(startX), 'e Y= ', as.character(startY)), file = logCaminho, append = TRUE)
+print(c('Visitando a posição X= ', as.character(startX), 'e Y= ', as.character(startY)))
 if(startX == targetX && startY == targetY){                     #Verificando se a condição de parada ocorreu
     return (c(startX,startY))                                   #Retornando o par ordenado do fim
 }
@@ -142,7 +142,7 @@ for (i in 3:length(caminho)){
         mataux[xCaminho,yCaminho]=5
     }
 }
-custo
+print(paste("O custo foi de: ",custo))
 ```
 Mostrando o mapa do caminho percorrido
 ```{r}
