@@ -1,19 +1,23 @@
----
+# ---
 title: "Map Search"
 output: M_Search
 ---
 
-Este projeto visa explorar possibilidades de algoritmos simples de busca em um mapa 42x42 gerado por arquivo CSV.
+## Grupo:
 
-Começando importando o plot.matrix e recebendo o CSV
+### Gabriel Gonçalves Mattos Santini Gustavo Melo Cacau Henrique Victorino Dias Lucas Rodrigues São João Miguel Vinicius Rabelo Mancini
+
+#### Este projeto visa implementar um algoritmo de busca em profundidade simples em um mapa 42x42 gerado por arquivo CSV.
+
+##### Começando importando o plot.matrix e recebendo o CSV
 
 ```{r}
 library('plot.matrix')
-csv <- read.csv("ExemploArquivoEntrada.csv", sep=';', header=FALSE)
+csv <- read.csv(file = file.choose(), sep=';', header=FALSE)
 options(expressions=500000)
 ```
 
-Então, separando o mapa em linhas e os elementos um por um
+##### Então, separando o mapa em linhas e os elementos um por um
 
 ```{r}
 splt<-c()
@@ -23,37 +27,37 @@ splt[i-1] <- c(strsplit(row,split=","))
 }
 ```
 
-Criando uma matrix com os elementos da lista de valores adquirida
+##### Criando uma matrix com os elementos da lista de valores adquirida
 
 ```{r}
 mtrx <- matrix(unlist(splt), ncol = 42, nrow = 42)
 ```
 
-Mas a matriz mtrx está transposta em relação à apresentada pelo professor, então devemos transpô-la novamente para ela ficar como o esperado
+##### Mas a matriz mtrx está transposta em relação à apresentada pelo professor, então devemos transpô-la novamente para ela ficar como o esperado
 
 ```{r}
 matrix<-t(mtrx)
 ```
 
-Agora, para desenhar o mapa, é necessário criar uma paleta de cores com cores personalizadas
+##### Agora, para desenhar o mapa, é necessário criar uma paleta de cores com cores personalizadas
 
 ```{r}
 p<-c("#92d050","#948a54","#548dd4","#e36c0a")
 ```
 
-Desenhando o mapa
+##### Desenhando o mapa
 
 ```{r}
 plot(matrix,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='', breaks=1:4)
 ```
 
-Criando uma matrix auxiliar de zeros para auxiliar no algoritmo
+##### Criando uma matrix auxiliar de zeros para auxiliar no algoritmo
 
 ```{r}
 aux<- matrix(0,42,42)
 ```
 
-Criando a função de busca em profundidade, cuja ideia é seguir os caminhos até o fim deles, seguindo a ordem Norte,Leste,Sul,Oeste.
+##### Criando a função de busca em profundidade, cuja ideia é seguir os caminhos até o fim deles, seguindo a ordem Norte, Leste, Sul, Oeste.
 
 ```{r}
 caminhoTentado<-NA
@@ -100,7 +104,7 @@ return (c(-1,-1))                                               #Se não tem mai
 }
 ```
 
-Coletando o ponto de inicio e o objetivo
+##### Coletando o ponto de inicio e o objetivo
 
 ```{r}
 inicio<-csv[1,]
@@ -117,7 +121,7 @@ fim[1]=a1
 fim[2]<-a2
 ```
 
-Testando o algoritmo
+##### Testando o algoritmo
 
 ```{r}
 gc()
@@ -126,7 +130,7 @@ caminho<-dfs(inicio[[1]]+1,inicio[[2]]+1,fim[[1]]+1,fim[[2]]+1,aux,matrix)
 caminhoTentado<-caminhoTentado[2:length(caminhoTentado)]
 ```
 
-Calculando o custo sem os custos de caminhar o inicio e o fim (Não sei se precisa contar eles ou não)
+##### Calculando o custo sem o custo de caminhar o inicio
 
 ```{r}
 custo<-0
@@ -144,12 +148,16 @@ for (i in 3:length(caminho)){
 }
 print(paste("O custo foi de: ",custo))
 ```
-Mostrando o mapa do caminho percorrido
+
+##### Mostrando o mapa do caminho percorrido
+
 ```{r}
 p<-c("#92d050","#948a54","#548dd4","#e36c0a","#000000")
 plot(mataux,col = colorRampPalette(p), key=NULL, axis.col = NULL, axis.row = NULL, xlab='',ylab='',breaks=1:5)
 ```
-Mostrando o mapa de todo caminho tentado
+
+##### Mostrando o mapa de todo caminho tentado
+
 ```{r}
 mataux<-matrix
 mataux[inicio[[1]]+1,inicio[[2]]+1]<-5
